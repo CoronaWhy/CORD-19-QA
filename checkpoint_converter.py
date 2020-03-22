@@ -20,7 +20,7 @@ def convert_tf_checkpoint_to_pytorch(tf_checkpoint_path:str, bert_config_file:st
     print("Save PyTorch model to {}".format(pytorch_dump_path))
     torch.save(model.state_dict(), pytorch_dump_path)
 
-
+    
 def load_tf_weights_in_bert(model:BertForQuestionAnswering, config:BertConfig, tf_checkpoint_path:str)-> BertForQuestionAnswering:
     """ Load tf checkpoints in a pytorch model.
     """
