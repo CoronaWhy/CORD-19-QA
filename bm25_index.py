@@ -91,6 +91,10 @@ def format_body(body_text):
         body += "\n\n"
     return body
 
+def paragraphize_body(body_text):
+    paragraphs = [di['text'] for di in body_text if len(di['text'].split()) > 1]
+    return paragraphs
+
 def format_bib(bibs):
     """
     Formats the bibliography from the JSON file.
@@ -120,7 +124,7 @@ def load_files(dirname):
         raw_files.append(file) 
     return raw_files
 
-def generate_clean_df(all_files):
+def generate_clean_df(all_files, paragraphs=True):
     """
     Generates a Pandas DataFrame from the raw file data created by load_files().
     """
@@ -134,13 +138,20 @@ def generate_clean_df(all_files):
             format_authors(file['metadata']['authors'], 
                            with_affiliation=True),
             format_body(file['abstract']),
-            format_body(file['body_text'])
             # format_bib(file['bib_entries']),
             # file['metadata']['authors'],
             # file['bib_entries']
         ]
 
-        cleaned_files.append(features)
+        if paragraphs:
+            all_paragraphs = paragraphize_body(file['body_text'])
+            for p in all_paragraphs:
+                new_features = features.copy()
+                new_features.append(p)
+                cleaned_files.append(new_features)
+        else:
+            features.append(format_body(file['body_text']))
+            cleaned_files.append(features)
 
     col_names = ['paper_id', 'title', 'authors',
                  'affiliations', 'abstract', 'text'] 
@@ -182,12 +193,13 @@ if __name__ == '__main__':
     psr.add_argument("--result-path-base", type=str, default="results/query")
     psr.add_argument("--query", type=str, default="cruise ship")
     psr.add_argument("--nresults", type=int, default=5)
+    psr.add_argument("--paragraphs", action='store_true', default=True)
     args = psr.parse_args()
 
     if args.rebuild_index or not os.path.isfile(args.index_path):
         files = load_files(args.data_dir)
         print("Loaded {} files".format(len(files)))
-        df = generate_clean_df(files) 
+        df = generate_clean_df(files, paragraphs=args.paragraphs)
         search_idx = BM25Index(df)
         print("Caching index...")
         pickle.dump(search_idx, open(args.index_path, "wb"))
@@ -196,4 +208,4 @@ if __name__ == '__main__':
         search_idx = pickle.load(open(args.index_path, "rb"))
     results = search_idx.search(args.query)
     print(results[['title','score']])
-    results.drop(labels='text', axis=1).to_csv("_".join([args.result_path_base, args.query.replace(" ","_"), "top{}".format(args.nresults)]) + ".csv", index=False)
+    results.to_csv("_".join([args.result_path_base, args.query.replace(" ","_"), "top{}".format(args.nresults)]) + ".csv", index=False)
