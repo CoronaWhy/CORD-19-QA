@@ -14,6 +14,8 @@ import pickle
 # preprocessing
 import string
 import nltk
+from nltk.stem import WordNetLemmatizer
+wn_lemmatizer = WordNetLemmatizer()
 
 # model
 from rank_bm25 import BM25Okapi
@@ -162,6 +164,15 @@ def generate_clean_df(all_files, paragraphs=True):
     clean_df = clean_df.drop_duplicates(subset='title')
     return clean_df
 
+def clean_text(text):
+    uncased = text.translate(PUNCTUATION_REMOVER).lower()
+    tokens = [wn_lemmatizer.lemmatize(token) for token in nltk.word_tokenize(uncased) 
+                if len(token) > 1
+                and not token in STOPWORDS
+                and not (token.isnumeric() and len(token) != 4)
+                and (not token.isnumeric() or token.isalpha())]
+    return tokens
+
 class BM25Index:
     def __init__(self, df):
         self.data = df
@@ -175,15 +186,6 @@ class BM25Index:
         results = self.data.iloc[ind].copy()
         results['score'] = doc_scores[ind]
         return results
-
-def clean_text(text):
-    uncased = text.translate(PUNCTUATION_REMOVER).lower()
-    tokens = [token for token in nltk.word_tokenize(uncased) 
-                if len(token) > 1
-                and not token in STOPWORDS
-                and not (token.isnumeric() and len(token) != 4)
-                and (not token.isnumeric() or token.isalpha())]
-    return tokens
 
 if __name__ == '__main__':
     psr = ArgumentParser()
