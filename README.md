@@ -4,12 +4,19 @@ CORD-19 Question Answering
 This repo contains tools for training/running neural mult-document question answering models to help researchers identify relevant articles in the CORD-19 dataset.
 Currently very under construction. STAY TUNED FOR UPDATES!
 
+## Overview
+
+Our approach is based off of [DrQA](https://github.com/facebookresearch/DrQA)(Chen et al. 2017).
+Our is pipeline comprised of two components:
+1. A document retriever. Currently, a BM25 search index.
+2. A document reader. Currently, BioBERT fine-tuned on the BioASQ dataset.
+
 ## Tasks
 
-- Build BM25 index over CORD-19 to retrieve relevant paragraphs (from abstracts and results)
-- Convert BioASQ-8b to SQuAD format, with full-abstract contexts
-- Fine-tune the pretrained BioBERT on SQuAD-ified BioASQ-8b
-- Evaluate on CORD-19 (connect the retriever with the answerer)
+Tasks directly related to this project are tracked [here](https://github.com/CoronaWhy/CORD-19-QA/projects/1).
+
+Please note that we have a healthy team of contributors for this project.
+If you are looking for a project to contribute to but do not have much experience with QA, then we recommend trying to solve one of the tasks posted in our [requests for other teams](https://github.com/CoronaWhy/CORD-19-QA/projects/2).
 
 ## Usage
 
