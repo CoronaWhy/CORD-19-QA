@@ -1,7 +1,7 @@
 CORD-19 Question Answering
 ===
 
-This repo contains tools for training/running neural mult-document question answering models to help researchers identify relevant articles in the CORD-19 dataset.
+This repo contains tools for training/running neural multi-document question answering models to help researchers identify relevant articles in the CORD-19 dataset.
 Currently very under construction. STAY TUNED FOR UPDATES!
 
 ## Overview
